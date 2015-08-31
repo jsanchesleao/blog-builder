@@ -15,6 +15,9 @@ var postsPattern = path.join(contentDir, 'posts', '**/*.md');
 var templatesPattern = path.join(contentDir, 'templates', '**/*.hbt');
 var compiledPostsDir = path.join(compileDir, 'posts');
 var templates = {};
+var intlData = {
+  locales: 'en-US'
+};
 
 var postName = function(parsedPost) {
   var name = dateformat(parsedPost.date, 'dd-mm-yyyy') + '_' + parsedPost.title;
@@ -24,7 +27,7 @@ var postName = function(parsedPost) {
 var buildPost = function(filename) {
   var file = fs.readFileSync(filename, {encoding: 'utf-8'})
   var parsed = parser(file)
-  var post   = templates[parsed.template](parsed);
+  var post   = templates[parsed.template](parsed, {data: {intl: intlData}});
   var name   = postName(parsed);
   mkdirp.sync(path.join(compiledPostsDir, name));
   fs.writeFileSync(path.join(compiledPostsDir, name, 'index.html'), post);
@@ -42,7 +45,7 @@ var buildAboutMe = function() {
       path.join(contentDir, 'pages', 'about.md'), 
       {encoding: 'utf8'}));
 
-  var page = templates['page.hbt'](parsed);
+  var page = templates['page.hbt'](parsed, {data: {intl: intlData}});
   var name = parsed.name.toLowerCase().replace(/[^\w\d]/g, '_').trim();
 
   mkdirp.sync(path.join(compileDir, name));
@@ -80,6 +83,10 @@ glob(templatesPattern, function(err, filenames) {
     fs.writeFileSync(path.join(compiledPostsDir, '..', 'index.html'), templates['index.hbt']({
       posts: posts,
       pages: pages
+    }, {
+    data: {
+      intl: intlData
+      }
     }));
   });
 });
