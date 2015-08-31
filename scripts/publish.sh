@@ -5,5 +5,9 @@ echo "Compiling blog"
 npm run compile
 
 echo "Publishing website"
-git add --all && git commit -m "$(date)" && git push --recurse-submodules=on-demand
+cd public
+git checkout master && git add --all && git commit -m "$(date)" && git push
 
+echo "Updating Repository"
+cd ..
+git add --all && git commit -m "publish $(date)" && git push
