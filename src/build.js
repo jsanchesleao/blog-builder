@@ -27,6 +27,9 @@ var postName = function(parsedPost) {
 var buildPost = function(filename) {
   var file = fs.readFileSync(filename, {encoding: 'utf-8'})
   var parsed = parser(file)
+  if (!parsed.publish) {
+    return;
+  }
   var post   = templates[parsed.template](parsed, {data: {intl: intlData}});
   var name   = postName(parsed);
   mkdirp.sync(path.join(compiledPostsDir, name));
@@ -81,7 +84,7 @@ glob(templatesPattern, function(err, filenames) {
     });
 
     fs.writeFileSync(path.join(compiledPostsDir, '..', 'index.html'), templates['index.hbt']({
-      posts: posts,
+      posts: posts.filter(function(p) { return !!p }),
       pages: pages
     }, {
     data: {

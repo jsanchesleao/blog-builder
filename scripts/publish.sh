@@ -1,4 +1,7 @@
 echo "Fetching new posts"
+cd public 
+git reset --hard
+cd ..
 git submodule update --remote --merge
 
 echo "Compiling blog"
