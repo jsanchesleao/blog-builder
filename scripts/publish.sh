@@ -11,3 +11,5 @@ git checkout master && git add --all && git commit -m "$(date)" && git push
 echo "Updating Repository"
 cd ..
 git add --all && git commit -m "publish $(date)" && git push
+
+echo "Done :)"
