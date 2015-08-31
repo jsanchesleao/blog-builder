@@ -1,0 +1,6 @@
+[submodule "content"]
+	path = content
+	url = git@github.com:jsanchesleao/blog.git
+[submodule "public"]
+	path = public
+	url = git@github.com:jsanchesleao/jsanchesleao.github.com.git
