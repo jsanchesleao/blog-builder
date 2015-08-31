@@ -9,7 +9,7 @@ npm run compile
 
 echo "Publishing website"
 cd public
-git checkout master && git add --all && git commit -m "$(date)" && git push
+git reset --hard && git checkout master && git add --all && git commit -m "$(date)" && git push
 
 echo "Updating Repository"
 cd ..
