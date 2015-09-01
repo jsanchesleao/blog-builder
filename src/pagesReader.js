@@ -5,8 +5,12 @@ const path = require('path')
 
 const PAGES_GLOB_PATTERN = path.join(__dirname, '..', 'content', 'pages', '**/*.md')
 
-const pagesIndex = function() {
+const pagesMetaIndex = function() {
   return contentReader.metaIndex(PAGES_GLOB_PATTERN)
 }
 
-module.exports = {pagesIndex}
+const pagesIndex = function() {
+  return contentReader.contentIndex(PAGES_GLOB_PATTERN)
+}
+
+module.exports = {pagesIndex, pagesMetaIndex}

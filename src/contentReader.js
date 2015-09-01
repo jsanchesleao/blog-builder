@@ -5,25 +5,30 @@ const path = require('path')
 const globReader = require('./globReader')
 const markdownReader = require('./markdownReader')
 
-const metaIndex = function(globPattern) {
-  let ch = csp.chan()
-  let files = globReader.files(globPattern)
-  
-  csp.go(function* () {
-    while(true) {
-      let file = yield csp.take(files)
-      if (file !== csp.CLOSED) {
-        let compiled = yield csp.take(markdownReader.compileMarkdownMeta(file))
-        yield csp.put(ch, compiled)
+const index = function(compileFn) {
+  return function(globPattern, transducer) {
+    let ch = csp.chan(2, transducer)
+    let files = globReader.files(globPattern)
+    
+    csp.go(function* () {
+      while(true) {
+        let file = yield csp.take(files)
+        if (file !== csp.CLOSED) {
+          let compiled = yield csp.take(compileFn(file))
+          yield csp.put(ch, compiled)
+        }
+        else {
+          ch.close()
+          return
+        }
       }
-      else {
-        ch.close()
-        return;
-      }
-    }
-  });
+    })
 
-  return ch
-};
+    return ch
+  }
+}
 
-module.exports = {metaIndex}
+const metaIndex = index(markdownReader.compileMarkdownMeta) 
+const contentIndex = index(markdownReader.compileMarkdown) 
+
+module.exports = {metaIndex, contentIndex}

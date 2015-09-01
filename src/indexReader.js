@@ -9,10 +9,16 @@ const concat = function(ch) {
 }
 
 const index = function() {
-  let postsCh = concat(postsReader.postsIndex())
-  let pagesCh = concat(pagesReader.pagesIndex())
+  let postsCh = concat(postsReader.postsMetaIndex())
+  let pagesCh = concat(pagesReader.pagesMetaIndex())
   return csp.go(function* () {
     let posts = yield csp.take(postsCh)
+
+    // most recent posts first
+    posts.sort(function(a, b) {
+      return a.date.valueOf() < b.date.valueOf()
+    })
+
     let pages = yield csp.take(pagesCh)
     return {posts, pages}
   })

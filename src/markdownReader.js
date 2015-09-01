@@ -2,21 +2,8 @@
 
 const marked = require('marked')
 const yaml   = require('js-yaml')
-const fs     = require('fs')
 const csp    = require('js-csp')
-
-const readFile = function(path) {
-  var chan = csp.chan()
-  fs.readFile(path, {encoding: 'utf-8'}, function(err, data) {
-    if (err) {
-      console.log('Error reading file: ', err)
-    }
-    else {
-      csp.putAsync(chan, data)
-    }
-  });
-  return chan
-}
+const fileReader = require('./fileReader')
 
 const parseText = function(text) {
   let split = text.split(/---\r?\n/)
@@ -27,7 +14,7 @@ const parseText = function(text) {
 
 const compileMarkdownMeta = function(path) {
   return csp.go(function* () {
-    let text = yield csp.take(readFile(path))
+    let text = yield csp.take(fileReader.read(path))
     let parsed = parseText(text)
     delete parsed.content
     return parsed
@@ -36,11 +23,11 @@ const compileMarkdownMeta = function(path) {
 
 const compileMarkdown = function (path) {
   return csp.go(function*() {
-    let text = yield csp.take(readFile(path))
+    let text = yield csp.take(fileReader.read(path))
     let parsed = parseText(text)
     parsed.content = marked(parsed.content)
     return parsed
   })
 }
 
-module.exports = { readFile, compileMarkdownMeta, compileMarkdown }
+module.exports = {compileMarkdownMeta, compileMarkdown}
