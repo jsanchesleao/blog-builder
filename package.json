@@ -4,6 +4,7 @@
   "description": "my personal blog",
   "main": "src/build.js",
   "scripts": {
+    "fetchPosts": "cd content && git checkout master && git pull",
     "publish": "sh scripts/publish.sh",
     "compile": "iojs src/buildCsp.js",
     "postcompile": "cp -r content/assets/* public/",
