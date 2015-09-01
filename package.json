@@ -5,7 +5,7 @@
   "main": "src/build.js",
   "scripts": {
     "publish": "sh scripts/publish.sh",
-    "compile": "iojs src/build.js",
+    "compile": "iojs src/buildCsp.js",
     "postcompile": "cp -r content/assets/* public/",
     "prestart": "npm run compile",
     "start": "http-server public/"
