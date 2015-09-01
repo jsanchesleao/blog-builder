@@ -5,8 +5,6 @@ const path = require('path')
 const globReader = require('./globReader')
 const markdownReader = require('./markdownReader')
 
-const INDEX_GLOB_PATTERN = path.join(__dirname, '..', 'content', 'posts', '**/*.md')
-
 const metaIndex = function(globPattern) {
   let ch = csp.chan()
   let files = globReader.files(globPattern)
@@ -15,7 +13,7 @@ const metaIndex = function(globPattern) {
     while(true) {
       let file = yield csp.take(files)
       if (file !== csp.CLOSED) {
-        let compiled = yield markdownReader.compileMarkdownMeta(file)
+        let compiled = yield csp.take(markdownReader.compileMarkdownMeta(file))
         yield csp.put(ch, compiled)
       }
       else {
