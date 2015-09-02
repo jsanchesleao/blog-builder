@@ -1,6 +1,10 @@
 "use strict"
 
-const csp = require('js-csp')
+const csp = require('js-csp'),
+      go = csp.go,
+      take = csp.take,
+      put = csp.put
+
 const directoryCleaner = require('./directoryCleaner')
 
 const indexReader = require('./indexReader')
@@ -12,22 +16,30 @@ const indexWriter = require('./indexWriter')
 const postsWriter = require('./postsWriter')
 const pagesWriter = require('./pagesWriter')
 
-
 let indexCh = indexReader.index()
 let templCh = templatesReader.index()  
 let errorCh = csp.chan()  
 
-csp.go(function* () {
-  let err = yield csp.take(errorCh)
+go(function* () {
+  let err = yield take(errorCh)
   console.log('ERROR: ', err)
+  process.exit(1)
 })
 
-csp.go(function* () {
-  let index = yield csp.take(indexCh)
-  let templates = yield csp.take(templCh)
-  yield csp.go(directoryCleaner.cleanUp, [errorCh])
+go(function* () {
+  let index = yield take(indexCh)
+  let templates = yield take(templCh)
+  yield go(directoryCleaner.cleanUp, [errorCh])
 
-  csp.go(indexWriter.write, [index, templates, errorCh])
-  csp.go(postsWriter.write, [postsReader.postsIndex(), index, templates, errorCh])
-  csp.go(pagesWriter.write, [pagesReader.pagesIndex(), index, templates, errorCh])
+  let tasks = [
+    go(indexWriter.write, [index, templates, errorCh]),
+    go(postsWriter.write, [postsReader.postsIndex(), index, templates, errorCh]),
+    go(pagesWriter.write, [pagesReader.pagesIndex(), index, templates, errorCh])
+  ]
+
+  for (let i = 0; i < tasks.length; i++) {
+    yield take(tasks[i])
+  }
+
+  console.log('Done :)')
 })
