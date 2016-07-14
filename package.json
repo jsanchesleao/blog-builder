@@ -6,7 +6,7 @@
   "scripts": {
     "fetchPosts": "cd content && git checkout master && git pull",
     "publish": "sh scripts/publish.sh",
-    "compile": "iojs src/buildCsp.js",
+    "compile": "node src/buildCsp.js",
     "postcompile": "cp -r content/assets/* public/",
     "prestart": "npm run compile",
     "start": "http-server public/"
